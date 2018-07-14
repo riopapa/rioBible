@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         //1번째 백버튼 클릭
-        if(System.currentTimeMillis()>backKeyPressedTime+2000){
+        if(System.currentTimeMillis()>backKeyPressedTime+2000){ // 2초 내에 back click ?
             backKeyPressedTime = System.currentTimeMillis();
             Toast.makeText(this, "뒤로버튼을 한번 더 누르시면 앱이 종료됩니다.", Toast.LENGTH_SHORT).show();
         }
@@ -115,7 +115,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 return;
             }
-
             case MY_PERMISSIONS_INTERNET: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
