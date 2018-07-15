@@ -18,6 +18,8 @@ public class MainActivity extends AppCompatActivity {
     long backKeyPressedTime;
     private final static int MY_PERMISSIONS_WRITE_FILE = 101;
     private final static int MY_PERMISSIONS_INTERNET = 102;
+    public boolean Permission_Write = false;
+    public boolean Permission_Internet = false;
 
     WebView webView;
     String bibleFolder = getPublicAlbumStorageDir("rioHolyBible");
@@ -33,10 +35,14 @@ public class MainActivity extends AppCompatActivity {
 
         getExternalWritePermission();
         getInternetPermission();
+        if ( Permission_Write == true &&  Permission_Internet == true) {
+            webView.loadUrl("file:///" + bibleFolder + "index.html");
+        }
+        else {
+            Toast.makeText(getApplicationContext(),"안드로이드 허가 관계를 확인해 주세요",
+                    Toast.LENGTH_LONG).show();
 
-
-//        Toast.makeText(getApplicationContext(),"[" + bibleFolder + "]", Toast.LENGTH_LONG).show();
-        webView.loadUrl("file:///" + bibleFolder + "index.html");
+        }
     }
 
     public String getPublicAlbumStorageDir(String bibleFolder) {
@@ -45,41 +51,49 @@ public class MainActivity extends AppCompatActivity {
 
         return file.toString() + "/" + bibleFolder + "/";
     }
+
     public void getInternetPermission() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.INTERNET)
                 != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.INTERNET)) {
-                Toast.makeText(getApplicationContext(),
-                        "인터넷에 접근할 수 있도록 허락하고 다시 실행해 주세요.", Toast.LENGTH_LONG).show();
-            } else {
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+//                    Manifest.permission.INTERNET)) {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.INTERNET},
                         MY_PERMISSIONS_INTERNET);
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.INTERNET)
+                    == PackageManager.PERMISSION_GRANTED) {
+                Permission_Internet = true;
+            } else {
+                Toast.makeText(getApplicationContext(),
+                    "인터넷에 접근할 수 있도록 허락하고 다시 실행해 주세요.", Toast.LENGTH_LONG).show();
             }
         }
+        else Permission_Internet = true;
     }
     public void getExternalWritePermission() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
-
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-
-                Toast.makeText(getApplicationContext(),
-                        "파일을 읽고 쓸 수 있도록 허락하고 다시 실행해 주세요.", Toast.LENGTH_LONG).show();
-            } else {
-
-                // No explanation needed, we can request the permission.
-
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+//                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         MY_PERMISSIONS_WRITE_FILE);
-            }
+                if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                    Permission_Write = true;
+                } else {
+                    Toast.makeText(getApplicationContext(),
+                        "파일을 읽고 쓸 수 있도록 허락되어야 사용할 수 있습니다.", Toast.LENGTH_LONG).show();
+                    finish();
+                    System.exit(0);
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                }
         }
+        else Permission_Write = true;
     }
 
     @Override
@@ -106,12 +120,13 @@ public class MainActivity extends AppCompatActivity {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(getApplicationContext(),
-                            "파일 읽고 쓰기가 허락되었습니다.", Toast.LENGTH_LONG).show();
-
+                            "파일 읽고 쓰기가 허락되었습니다.\n다시 시작해 주세요", Toast.LENGTH_LONG).show();
                 } else {
-
                     Toast.makeText(getApplicationContext(),
                             "파일 읽고 쓸 수가 없군요.", Toast.LENGTH_LONG).show();
+                    finish();
+                    System.exit(0);
+                    android.os.Process.killProcess(android.os.Process.myPid());
                 }
                 return;
             }
@@ -120,8 +135,7 @@ public class MainActivity extends AppCompatActivity {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(getApplicationContext(),
-                            "인터넷 접근이 허락되었습니다.", Toast.LENGTH_LONG).show();
-
+                            "인터넷 접근이 허락되었습니다.\n다시 시작해 주세요", Toast.LENGTH_LONG).show();
                 } else {
 
                     Toast.makeText(getApplicationContext(),
